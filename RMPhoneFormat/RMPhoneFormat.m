@@ -540,6 +540,10 @@
 }
 
 - (BOOL)isValidPhoneNumber:(NSString *)orig {
+	return [self isValidPhoneNumber:orig strict:NO];
+}
+
+- (BOOL)isValidPhoneNumber:(NSString *)orig strict:(BOOL)strict {
     // First see if the number starts with either the country's trunk prefix or international prefix. If so save it
     // off and remove from the number.
     NSString *str = orig;
@@ -565,6 +569,10 @@
     }
     
     // No exact matches so now allow for optional prefixes
+	if (strict) {
+		return NO;
+	}
+	
     for (RuleSet *set in self.ruleSets) {
         BOOL valid = [set isValid:str intlPrefix:intlPrefix trunkPrefix:trunkPrefix prefixRequired:NO];
         if (valid) {
@@ -763,7 +771,12 @@ static NSMutableDictionary *flagRules = nil;
     //return orig;
 }
 
-- (BOOL)isPhoneNumberValid:(NSString *)phoneNumber {
+- (BOOL)isPhoneNumberValid:(NSString *)phoneNumber
+{
+	return [self isPhoneNumberValid:phoneNumber strict:NO];
+}
+
+- (BOOL)isPhoneNumberValid:(NSString *)phoneNumber strict:(BOOL)strict {
     // First remove all added punctuation to get just raw phone number characters.
     NSString *str = [RMPhoneFormat strip:phoneNumber];
     
@@ -780,7 +793,7 @@ static NSMutableDictionary *flagRules = nil;
         CallingCodeInfo *info = [self findCallingCodeInfo:rest];
         if (info) {
             // We found a matching country. Use that info to see if the number is complete.
-            BOOL valid = [info isValidPhoneNumber:rest];
+            BOOL valid = [info isValidPhoneNumber:rest strict:strict];
             
             return valid;
         } else {
@@ -808,7 +821,7 @@ static NSMutableDictionary *flagRules = nil;
                 CallingCodeInfo *info2 = [self findCallingCodeInfo:rest];
                 if (info2) {
                     // We found a matching country. Use that info to see if the number is complete.
-                    BOOL valid = [info2 isValidPhoneNumber:rest];
+                    BOOL valid = [info2 isValidPhoneNumber:rest strict:strict];
                     
                     return valid;
                 } else {
@@ -821,7 +834,7 @@ static NSMutableDictionary *flagRules = nil;
             }
         } else {
             // No access code so we handle cases 3 and 4 and validate the number using the user's region format.
-            BOOL valid = [info isValidPhoneNumber:str];
+            BOOL valid = [info isValidPhoneNumber:str strict:strict];
             
             return valid;
         }

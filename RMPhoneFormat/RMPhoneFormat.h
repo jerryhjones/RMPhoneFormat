@@ -44,6 +44,7 @@
 - (NSSet *)countriesForCallingCode:(NSString *)callingCode;
 // Determines if the given phone number is a complete phone number (with or without formatting)
 - (BOOL)isPhoneNumberValid:(NSString *)phoneNumber;
+- (BOOL)isPhoneNumberValid:(NSString *)phoneNumber strict:(BOOL)strict;
 
 #ifdef DEBUG
 - (void)dump;
